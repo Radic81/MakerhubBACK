@@ -31,6 +31,25 @@ namespace CabMedicalBACK.DAL.Repositories
             return _connection.Query<RendezVous>(query);
         }
 
+        public IEnumerable<RendezVous> GetByUtilisateur(int idUtilisateur)
+        {
+            const string query = @"
+                SELECT
+                    ""id_rendez_vous"" AS ""IdRendezVous"",
+                    ""date_debut""     AS ""DateDebut"",
+                    ""date_fin""       AS ""DateFin"",
+                    ""statut""         AS ""Statut"",
+                    ""description""    AS ""Description"",
+                    ""motif_rdv""      AS ""MotifRdv"",
+                    ""id_patient""     AS ""IdPatient"",
+                    ""id_utilisateur"" AS ""IdUtilisateur""
+                FROM ""rendez_vous""
+                WHERE ""id_utilisateur"" = @UserId;
+            ";
+
+            return _connection.Query<RendezVous>(query, new { UserId = idUtilisateur });
+        }
+
         public RendezVous? GetById(int id)
         {
             const string query = @"
@@ -109,7 +128,7 @@ namespace CabMedicalBACK.DAL.Repositories
                 IdRendezVous = rendezVous.IdRendezVous
             });
 
-            
+
             return affectedRows > 0;
         }
 

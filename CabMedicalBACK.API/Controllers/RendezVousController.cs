@@ -24,8 +24,8 @@ namespace CabMedicalBACK.API.Controllers
         {
             try
             {
-                var liste = _rendezVousService.GetAll()
-                                              .Select(r => r.ToDTO());
+                var liste = _rendezVousService.GetAll().Select(r => r.ToDTO());
+                
                 return Ok(liste);
             }
             catch
@@ -44,7 +44,7 @@ namespace CabMedicalBACK.API.Controllers
             {
                 var rv = _rendezVousService.GetById(id);
                 if (rv == null)
-                    return NotFound($"Rendez-vous with ID {id} not found.");
+                    return NotFound($"Le rendez-vous {id} n'a pas été trouvé");
                 
                 return Ok(rv.ToDTO());
             }
@@ -53,6 +53,22 @@ namespace CabMedicalBACK.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+        
+        [HttpGet("utilisateur/{idUtilisateur}")]
+        public IActionResult GetByUtilisateur(int idUtilisateur)
+        {
+            try
+            {
+                var rdvList = _rendezVousService.GetByUtilisateur(idUtilisateur);
+                var resultDto = rdvList.Select(r => r.ToDTO());
+                return Ok(resultDto);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RendezVousCreateDTO))]
@@ -66,7 +82,7 @@ namespace CabMedicalBACK.API.Controllers
                 {
                     return CreatedAtAction(nameof(GetById), new { id = newId }, dto);
                 }
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating rendez-vous");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur lors de la création du rendez-vous");
             }
             catch
             {
@@ -86,7 +102,7 @@ namespace CabMedicalBACK.API.Controllers
                 {
                     return Ok(dto);
                 }
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating rendez-vous");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur lors de la mise à jour du rendez-vous");
             }
             catch
             {
@@ -106,7 +122,7 @@ namespace CabMedicalBACK.API.Controllers
                 {
                     return Ok();
                 }
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting rendez-vous");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur lors de la suppression du rendez-vous");
             }
             catch
             {

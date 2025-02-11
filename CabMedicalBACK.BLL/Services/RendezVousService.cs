@@ -25,6 +25,13 @@ namespace CabMedicalBACK.BLL.Services
             var entity = _rendezVousRepository.GetById(id);
             return entity?.ToModel();
         }
+        
+        public IEnumerable<RendezVous> GetByUtilisateur(int idUtilisateur)
+        {
+            var list = _rendezVousRepository.GetByUtilisateur(idUtilisateur);
+            return list.Select(r => r.ToModel());
+        }
+
 
         public int Create(RendezVous rendezVous)
         {
