@@ -66,7 +66,7 @@ namespace CabMedicalBACK.API.Mappers
             return new Models.Utilisateur
             {
                 MotDePasse = utilisateur.MotDePasse,
-                Email = utilisateur.Email
+                Email = utilisateur.Email,
             };
         }
 

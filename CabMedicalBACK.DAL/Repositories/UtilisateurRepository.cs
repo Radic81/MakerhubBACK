@@ -35,7 +35,7 @@ namespace CabMedicalBACK.DAL.Repositories
         {
             const string query = @"
                 SELECT
-                    ""id_utilisateur""       AS ""IdUtilisateur"",
+                   ""id_utilisateur""       AS ""IdUtilisateur"",
                     ""mot_de_passe""         AS ""MotDePasse"",
                     ""email""                AS ""Email"",
                     ""role""              AS ""Role"",
@@ -54,7 +54,9 @@ namespace CabMedicalBACK.DAL.Repositories
             const string query = @"
                 SELECT
                     ""mot_de_passe""         AS ""MotDePasse"",
-                    ""email""                AS ""Email""
+                    ""email""                AS ""Email"",
+                    ""role""              AS ""Role"",
+                    ""id_utilisateur""       AS ""IdUtilisateur""
                 FROM ""utilisateur""
                 WHERE ""email"" = @Email;
             ";

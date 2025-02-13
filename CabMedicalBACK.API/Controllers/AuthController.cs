@@ -3,7 +3,6 @@ using CabMedicalBACK.API.Mappers;
 using CabMedicalBACK.API.Services;
 using CabMedicalBACK.BLL.Exceptions;
 using CabMedicalBACK.BLL.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CabMedicalBACK.API.Controllers
@@ -14,11 +13,13 @@ namespace CabMedicalBACK.API.Controllers
     {
         private readonly IAuthService _authService;
         private readonly JwtService _jwtService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, JwtService jwtService)
+        public AuthController(IAuthService authService, JwtService jwtService, ILogger<AuthController> logger)
         {
             this._authService = authService;
             this._jwtService = jwtService;
+            this._logger = logger;
         }
 
         [HttpPost]
@@ -26,16 +27,15 @@ namespace CabMedicalBACK.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         public IActionResult Login([FromBody] UtilisateurLoginFormDTO utilisateurLoginFormDto)
-        
         {
             try
             {
                 UtilisateurLoginDTO? utilisateurLoginDto = this._authService.Login(utilisateurLoginFormDto.ToModel())?.ToLoginDTO();
-
+                
                 if (utilisateurLoginDto != null)
                 {
                     string token = this._jwtService.GenerateToken(utilisateurLoginDto);
-                    return this.Ok(new { token });
+                    return this.Ok(new {token});
                 }
 
                 return this.NotFound("les crédentials de login sont incorrect");
@@ -46,6 +46,7 @@ namespace CabMedicalBACK.API.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
                 return this.StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

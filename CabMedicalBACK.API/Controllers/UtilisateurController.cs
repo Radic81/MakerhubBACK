@@ -1,6 +1,7 @@
 using CabMedicalBACK.API.DTOs;
 using CabMedicalBACK.API.Mappers;
 using CabMedicalBACK.BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CabMedicalBACK.API.Controllers
@@ -47,9 +48,9 @@ namespace CabMedicalBACK.API.Controllers
 
                 return Ok(utilisateur.ToDTO());
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
