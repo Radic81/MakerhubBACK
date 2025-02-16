@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using CabMedicalBACK.API.DTOs;
 using CabMedicalBACK.API.Mappers;
 using CabMedicalBACK.BLL.Interfaces;
+using Newtonsoft.Json;
 
 namespace CabMedicalBACK.API.Controllers
 {
@@ -59,13 +60,21 @@ namespace CabMedicalBACK.API.Controllers
         {
             try
             {
+                Console.WriteLine($"Début GetByUtilisateur - ID: {idUtilisateur}");
+        
                 var rdvList = _rendezVousService.GetByUtilisateur(idUtilisateur);
+                Console.WriteLine($"Rendez-vous récupérés : {rdvList?.Count() ?? 0}");
+        
                 var resultDto = rdvList.Select(r => r.ToDTO());
+                Console.WriteLine("Conversion en DTO réussie");
+        
                 return Ok(resultDto);
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                Console.WriteLine($"ERREUR dans GetByUtilisateur: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -77,18 +86,50 @@ namespace CabMedicalBACK.API.Controllers
         {
             try
             {
+                // ✅ Log pour voir les données reçues
+                Console.WriteLine("Requête reçue pour la création d'un rendez-vous.");
+                Console.WriteLine($"Données reçues: {JsonConvert.SerializeObject(dto)}");
+
+                // ❌ Vérification que l'objet DTO n'est pas null
+                if (dto == null)
+                {
+                    Console.WriteLine("Erreur : l'objet reçu est null.");
+                    return BadRequest("Les données envoyées sont null.");
+                }
+
+                // ⚠ Vérification des champs obligatoires
+                if (dto.DateDebut == default || dto.DateFin == default)
+                {
+                    Console.WriteLine("Erreur : DateDebut ou DateFin est vide.");
+                    return BadRequest("Les dates de début et de fin sont obligatoires.");
+                }
+
+                if (dto.IdUtilisateur <= 0)
+                {
+                    Console.WriteLine("Erreur : Aucun médecin sélectionné.");
+                    return BadRequest("Un médecin doit être sélectionné pour ce rendez-vous.");
+                }
+
+                // ✅ Création du rendez-vous
                 int newId = _rendezVousService.Create(dto.ToModel());
                 if (newId > 0)
                 {
+                    Console.WriteLine($"Rendez-vous créé avec l'ID: {newId}");
                     return CreatedAtAction(nameof(GetById), new { id = newId }, dto);
                 }
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur lors de la création du rendez-vous");
+
+                // ❌ Si l'insertion en base de données échoue
+                Console.WriteLine("Échec de la création du rendez-vous.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Impossible de créer le rendez-vous.");
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                // 🔴 Capture et affichage de l'erreur
+                Console.WriteLine($"Exception levée: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RendezVousUpdateDTO))]

@@ -38,7 +38,6 @@ namespace CabMedicalBACK.DAL.Repositories
                     ""id_rendez_vous"" AS ""IdRendezVous"",
                     ""date_debut""     AS ""DateDebut"",
                     ""date_fin""       AS ""DateFin"",
-                    ""statut""         AS ""Statut"",
                     ""description""    AS ""Description"",
                     ""motif_rdv""      AS ""MotifRdv"",
                     ""id_patient""     AS ""IdPatient"",
@@ -86,7 +85,7 @@ namespace CabMedicalBACK.DAL.Repositories
                     @DateFin,
                     @Description,
                     @MotifRdv,
-                    @IdPatient,
+                    NULLIF(@IdPatient, 0), -- Met NULL si IdPatient vaut 0
                     @IdUtilisateur
                 )
                 RETURNING ""id_rendez_vous"" AS ""IdRendezVous"";
@@ -98,7 +97,7 @@ namespace CabMedicalBACK.DAL.Repositories
                 rendezVous.DateFin,
                 rendezVous.Description,
                 rendezVous.MotifRdv,
-                rendezVous.IdPatient,
+                IdPatient = rendezVous.IdPatient > 0 ? rendezVous.IdPatient : (int?)null,  // Met NULL si IdPatient est 0
                 rendezVous.IdUtilisateur
             });
         }
@@ -125,7 +124,7 @@ namespace CabMedicalBACK.DAL.Repositories
                 rendezVous.MotifRdv,
                 rendezVous.IdPatient,
                 rendezVous.IdUtilisateur,
-                IdRendezVous = rendezVous.IdRendezVous
+                rendezVous.IdRendezVous
             });
 
 
